@@ -1,0 +1,31 @@
+parameters:
+    app.access_token_ttl: '%env(int:ACCESS_TOKEN_TTL)%'
+    app.refresh_token_ttl: '%env(int:REFRESH_TOKEN_TTL)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Kernel.php'
+            # Entities and domain contracts are not services.
+            - '../src/*/Domain/'
+            # Value objects and request DTOs are created by hand or by the serializer.
+            - '../src/Auth/Application/TokenPair.php'
+            - '../src/Auth/Application/OpaqueToken.php'
+            - '../src/Auth/Ui/Http/Request/'
+
+    # Interfaces are bound explicitly, so a wrong or missing binding fails
+    # loudly instead of silently picking an implementation.
+    App\Shared\Application\Transaction: '@App\Shared\Infrastructure\Doctrine\DoctrineTransaction'
+    App\User\Domain\UserRepository: '@App\User\Infrastructure\Doctrine\DoctrineUserRepository'
+    App\Auth\Domain\RefreshTokenRepository: '@App\Auth\Infrastructure\Doctrine\DoctrineRefreshTokenRepository'
+    App\Auth\Application\AccessTokenIssuer: '@App\Auth\Infrastructure\Jwt\LexikAccessTokenIssuer'
+
+when@test:
+    services:
+        limiter.storage.in_memory:
+            class: Symfony\Component\RateLimiter\Storage\InMemoryStorage

@@ -1,0 +1,12 @@
+{
+	# TLS is terminated by the reverse proxy on the host, see docs/deployment.md.
+	auto_https off
+	admin off
+	frankenphp
+}
+
+:8080 {
+	root * /app/public
+	encode zstd gzip
+	php_server
+}

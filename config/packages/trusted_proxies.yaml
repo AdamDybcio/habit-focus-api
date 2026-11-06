@@ -1,0 +1,6 @@
+# The API runs behind a reverse proxy (Caddy). Trust its forwarded headers so
+# the rate limiter sees real client IPs and HTTPS is detected correctly.
+# TRUSTED_PROXIES is a comma separated list of proxy IPs or CIDR ranges.
+framework:
+    trusted_proxies: '%env(TRUSTED_PROXIES)%'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port']

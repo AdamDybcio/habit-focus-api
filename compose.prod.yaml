@@ -1,0 +1,50 @@
+# Production stack: API + Postgres. TLS is handled by the Caddy already running
+# on the host, which proxies to 127.0.0.1:8080.
+#
+#   docker compose -f compose.prod.yaml --env-file .env.prod.local up -d --build
+#
+# See docs/deployment.md for the full procedure.
+services:
+  app:
+    build:
+      context: .
+      target: prod
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      APP_ENV: prod
+      APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env.prod.local}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod.local}@database:5432/${POSTGRES_DB}?serverVersion=17&charset=utf8
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:?set JWT_PASSPHRASE in .env.prod.local}
+      ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL:-900}
+      REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL:-2592000}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES}
+    volumes:
+      # JWT keys live on the host, outside the image and outside git.
+      - ./config/jwt:/app/config/jwt:ro
+    ports:
+      # Only the host reverse proxy may reach the app.
+      - "127.0.0.1:8080:8080"
+    security_opt:
+      - no-new-privileges:true
+
+  database:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    # No published ports: reachable only from the app container.
+
+volumes:
+  database_data:

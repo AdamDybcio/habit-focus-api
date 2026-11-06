@@ -1,0 +1,33 @@
+doctrine:
+  dbal:
+    url: '%env(resolve:DATABASE_URL)%'
+    profiling_collect_backtrace: '%kernel.debug%'
+
+  orm:
+    auto_generate_proxy_classes: true
+    naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+    auto_mapping: false
+    mappings:
+      User:
+        type: attribute
+        is_bundle: false
+        dir: '%kernel.project_dir%/src/User/Domain'
+        prefix: 'App\User\Domain'
+        alias: User
+      Auth:
+        type: attribute
+        is_bundle: false
+        dir: '%kernel.project_dir%/src/Auth/Domain'
+        prefix: 'App\Auth\Domain'
+        alias: Auth
+
+when@test:
+  doctrine:
+    dbal:
+      # Tests use their own database: app_test.
+      dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+  doctrine:
+    orm:
+      auto_generate_proxy_classes: false

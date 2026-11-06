@@ -1,0 +1,15 @@
+.git
+.github
+.idea
+.vscode
+vendor
+var
+tests
+docs
+coverage
+.env.local
+.env.*.local
+config/jwt/*.pem
+compose*.yaml
+Dockerfile
+*.md

@@ -1,0 +1,20 @@
+/.env.local
+/.env.*.local
+/.env.local.php
+/var/
+/vendor/
+/.phpunit.cache/
+/.php-cs-fixer.cache
+/.phpstan.cache/
+
+# JWT keys are secrets
+/config/jwt/*.pem
+
+# IDE
+/.idea/
+/.vscode/
+*.swp
+.DS_Store
+
+# Coverage
+/coverage/

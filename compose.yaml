@@ -1,0 +1,22 @@
+# Local development: only the database runs in Docker, PHP runs on the host
+# (make serve). For production see compose.prod.yaml.
+services:
+  database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      # Bound to localhost only, never expose a database to the network.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  database_data:
