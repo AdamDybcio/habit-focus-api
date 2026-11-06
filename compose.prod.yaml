@@ -16,6 +16,7 @@ services:
     environment:
       APP_ENV: prod
       APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env.prod.local}
+      DEFAULT_URI: ${DEFAULT_URI:-http://localhost}
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod.local}@database:5432/${POSTGRES_DB}?serverVersion=17&charset=utf8
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:?set JWT_PASSPHRASE in .env.prod.local}
       ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL:-900}
