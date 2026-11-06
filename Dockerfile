@@ -19,7 +19,7 @@ RUN setcap -r /usr/local/bin/frankenphp || true \
     && chown -R app:app /data /config /app
 
 COPY docker/php.ini /usr/local/etc/php/conf.d/zz-app.ini
-COPY docker/Caddyfile /etc/caddy/Caddyfile
+COPY docker/Caddyfile /etc/frankenphp/Caddyfile
 
 # ---- Composer dependencies (production only) ----
 FROM base AS vendor
